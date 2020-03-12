@@ -25,7 +25,7 @@ IMPLICIT NONE
     PRINT *,"Enter the desired number of elements:"
     READ *,num_elem
     
-    print *,"\n\n\n"
+    print '(*(A))', NEW_LINE('a'), NEW_LINE('a')
     print "(es10.3)",rho_0
     print "(es10.3)",rho_L
     print "(es10.3)",L
