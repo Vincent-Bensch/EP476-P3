@@ -18,24 +18,27 @@ IMPLICIT NONE
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
     
+    INTERFACE
+        SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
+   	        INTEGER, PARAMETER :: rknd=SELECTED_REAL_KIND(14,14)
+            INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
+
+            INTEGER(KIND=iknd), INTENT(IN) :: N, KA, KB, LDAB, LDBB, LDZ
+            REAL(KIND=rknd), DIMENSION(LDAB, *), INTENT(INOUT) :: AB
+            REAL(KIND=rknd), DIMENSION(LDBB, *), INTENT(INOUT) :: BB
+            CHARACTER, INTENT(IN) :: JOBZ, UPLO
+            REAL(KIND=rknd), DIMENSION(*), INTENT(OUT) :: W, WORK
+            REAL(KIND=rknd), DIMENSION(LDZ, *), INTENT(OUT) :: Z
+            INTEGER(KIND=iknd), INTENT(OUT) :: INFO
+        END SUBROUTINE DSBGV  
+    END INTERFACE
+
 END MODULE fea_init
 
 
 PROGRAM fea_driver !Main program
 USE fea_init
 IMPLICIT NONE
-
-INTERFACE
-    SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
-        REAL(KIND=rknd), DIMENSION(LDAB, *), INTENT(INOUT) :: AB
-        REAL(KIND=rknd), DIMENSION(LDBB, *), INTENT(INOUT) :: BB
-        INTEGER(KIND=ikind), INTENT(IN) :: N, KA, KB, LDAB, LDBB, LDZ
-        CHARACTER, INTENT(IN) :: JOBZ, UPLO
-        REAL(KIND=rknd), DIMENSION(*) INTENT(OUT) :: W, WORK
-        REAL(KIND=rknd), DIMENSION(LDZ, *) INTENT(OUT) :: Z
-        INTEGER(KIND=ikind), INTENT(OUT) :: INFO
-    END SUBROUTINE DSBGV  
-END INTERFACE
 
     !Get parameters from user
     PRINT *,"Enter the density at x=0 (rho_0):"
