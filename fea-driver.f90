@@ -17,10 +17,15 @@ IMPLICIT NONE
     REAL(KIND=rknd), DIMENSION(2, 2) :: element, K_elem, M_elem !Sub matrix for current computation
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
+
+    !Variabled to catch DSBGV output
+    REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out
+    REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
+    INTEGER(KIND=iknd) :: info_out
     
     INTERFACE
         SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
-   	        INTEGER, PARAMETER :: rknd=SELECTED_REAL_KIND(14,14)
+   	    INTEGER, PARAMETER :: rknd=SELECTED_REAL_KIND(14,14)
             INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
 
             INTEGER(KIND=iknd), INTENT(IN) :: N, KA, KB, LDAB, LDBB, LDZ
@@ -83,8 +88,9 @@ IMPLICIT NONE
         j = i-1
         M(j:i , j:i) = K_elem * tmp
     END DO
-
-    CALL(DSBGV('N','L',num_elem,1,1,M,num_elem,K,num_elem))
+    
+    ALLOCATE ( eig_out( num_elem ) )
+    CALL( DSBGV( 'N', 'L', num_elem, 1, 1, M, num_elem, K, num_elem, eig_out, z_out, 1, 3*num_elem, info_out ) )
     
     
 END PROGRAM fea_driver
