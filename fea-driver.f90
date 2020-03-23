@@ -24,6 +24,19 @@ END MODULE fea_init
 PROGRAM fea_driver !Main program
 USE fea_init
 IMPLICIT NONE
+
+INTERFACE
+    SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
+        REAL(KIND=rknd), DIMENSION(LDAB, *), INTENT(INOUT) :: AB
+        REAL(KIND=rknd), DIMENSION(LDBB, *), INTENT(INOUT) :: BB
+        INTEGER(KIND=ikind), INTENT(IN) :: N, KA, KB, LDAB, LDBB, LDZ
+        CHARACTER, INTENT(IN) :: JOBZ, UPLO
+        REAL(KIND=rknd), DIMENSION(*) INTENT(OUT) :: W, WORK
+        REAL(KIND=rknd), DIMENSION(LDZ, *) INTENT(OUT) :: Z
+        INTEGER(KIND=ikind), INTENT(OUT) :: INFO
+    END SUBROUTINE DSBGV  
+END INTERFACE
+
     !Get parameters from user
     PRINT *,"Enter the density at x=0 (rho_0):"
     READ *,rho_o
@@ -68,7 +81,7 @@ IMPLICIT NONE
         M(j:i , j:i) = K_elem * tmp
     END DO
 
-    CALL(DSBGV('N','L',num_elem,1,1,))
+    CALL(DSBGV('N','L',num_elem,1,1,M,num_elem,K,num_elem))
     
     
 END PROGRAM fea_driver
