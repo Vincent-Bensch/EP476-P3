@@ -19,9 +19,9 @@ IMPLICIT NONE
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
 
     !Variabled to catch DSBGV output
-    REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out
+    REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out, work_out
     REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
-    INTEGER(KIND=iknd) :: info_out
+    INTEGER(KIND=iknd) :: info_out, one
     
     INTERFACE
         SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
@@ -90,6 +90,8 @@ IMPLICIT NONE
     END DO
     
     ALLOCATE ( eig_out( num_elem ) )
-    CALL DSBGV( 'N', 'L', num_elem, 1, 1, M, num_elem, K, num_elem, eig_out, z_out, 1, 3*num_elem, info_out )
+    ALLOCATE ( work_out( 3*num_elem ) )
+    one = 1
+    CALL DSBGV( 'N', 'L', num_elem, one, one, M, num_elem, K, num_elem, eig_out, z_out, one, work_out, info_out )
     
 END PROGRAM fea_driver
