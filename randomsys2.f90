@@ -10,8 +10,7 @@ program randomsys2
 
     ! initialize random number generator seed
     ! if you remove this, the same numbers will be generated each
-    ! time you run this code.
-    call init_random_seed()  
+    ! time you run this code. 
 
     print *, "Input n ... "
     read *, n

@@ -92,6 +92,9 @@ IMPLICIT NONE
     ALLOCATE ( eig_out( num_elem ) )
     ALLOCATE ( work_out( 3*num_elem ) )
     one = 1
-    CALL dsbgv('N', 'L', num_elem, one, one, M, num_elem, K, num_elem, eig_out, z_out, one, work_out, info_out)
+    CALL dsbgv('N', 'L', num_elem, one, one, K, num_elem, M, num_elem, eig_out, z_out, one, work_out, info_out)
     
+    DO i =1, SIZE(eig_out) 
+        PRINT *, eig_out(1)
+    END DO    
 END PROGRAM fea_driver
