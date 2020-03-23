@@ -17,26 +17,27 @@ IMPLICIT NONE
     REAL(KIND=rknd), DIMENSION(2, 2) :: element, K_elem, M_elem !Sub matrix for current computation
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
+    INTEGER :: Y,Z !DUMMY
 
     !Variabled to catch DSBGV output
-    REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out
-    REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
-    INTEGER(KIND=iknd) :: info_out
+    !REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out
+    !REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
+    !INTEGER(KIND=iknd) :: info_out
     
-    INTERFACE
-        SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
-   	    INTEGER, PARAMETER :: rknd=SELECTED_REAL_KIND(14,14)
-            INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
+    !INTERFACE
+    !    SUBROUTINE DSBGV(JOBZ, UPLO, N, KA, KB, AB, LDAB, BB, LDBB, W, Z, LDZ, WORK, INFO)
+    !        INTEGER, PARAMETER :: rknd=SELECTED_REAL_KIND(14,14)
+    !        INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
 
-            INTEGER(KIND=iknd), INTENT(IN) :: N, KA, KB, LDAB, LDBB, LDZ
-            REAL(KIND=rknd), DIMENSION(LDAB, *), INTENT(INOUT) :: AB
-            REAL(KIND=rknd), DIMENSION(LDBB, *), INTENT(INOUT) :: BB
-            CHARACTER, INTENT(IN) :: JOBZ, UPLO
-            REAL(KIND=rknd), DIMENSION(*), INTENT(OUT) :: W, WORK
-            REAL(KIND=rknd), DIMENSION(LDZ, *), INTENT(OUT) :: Z
-            INTEGER(KIND=iknd), INTENT(OUT) :: INFO
-        END SUBROUTINE DSBGV  
-    END INTERFACE
+    !        INTEGER(KIND=iknd), INTENT(IN) :: N, KA, KB, LDAB, LDBB, LDZ
+    !        REAL(KIND=rknd), DIMENSION(LDAB, *), INTENT(INOUT) :: AB
+    !        REAL(KIND=rknd), DIMENSION(LDBB, *), INTENT(INOUT) :: BB
+    !        CHARACTER, INTENT(IN) :: JOBZ, UPLO
+    !        REAL(KIND=rknd), DIMENSION(*), INTENT(OUT) :: W, WORK
+    !        REAL(KIND=rknd), DIMENSION(LDZ, *), INTENT(OUT) :: Z
+    !        INTEGER(KIND=iknd), INTENT(OUT) :: INFO
+    !    END SUBROUTINE DSBGV  
+    !END INTERFACE
 
 END MODULE fea_init
 
@@ -44,6 +45,12 @@ END MODULE fea_init
 PROGRAM fea_driver !Main program
 USE fea_init
 IMPLICIT NONE
+    INTERFACE
+        SUBROUTINE TEST_EXTERN(VAR_IN, VAR_OUT)
+            INTEGER, INTENT(IN) :: VAR_IN
+            INTEGER, INTENT(OUT) :: VAR_OUT
+        END SUBROUTINE TEST_EXTERN
+    END INTERFACE
 
     !Get parameters from user
     PRINT *,"Enter the density at x=0 (rho_0):"
@@ -89,8 +96,10 @@ IMPLICIT NONE
         M(j:i , j:i) = K_elem * tmp
     END DO
     
-    ALLOCATE ( eig_out( num_elem ) )
-    CALL( DSBGV( 'N', 'L', num_elem, 1, 1, M, num_elem, K, num_elem, eig_out, z_out, 1, 3*num_elem, info_out ) )
+    !ALLOCATE ( eig_out( num_elem ) )
+    !CALL( DSBGV( 'N', 'L', num_elem, 1, 1, M, num_elem, K, num_elem, eig_out, z_out, 1, 3*num_elem, info_out ) )
     
+    Y = 5
+    CALL TEST_EXTERN(Y, Z)
     
 END PROGRAM fea_driver
