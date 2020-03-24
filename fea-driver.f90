@@ -14,7 +14,8 @@ IMPLICIT NONE
     REAL(KIND=rknd) :: tmp !dummy computation variable
     REAL(KIND=rknd) :: K_mul
     REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: M, K !Initialize M and K matricies
-    REAL(KIND=rknd), DIMENSION(2, 2) :: K_elem, K_ins, M_elem !Sub matrix for current computation
+    REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: MB, KB !Banded M and K
+	REAL(KIND=rknd), DIMENSION(2, 2) :: K_elem, K_ins, M_elem !Sub matrix for current computation
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
 
@@ -46,6 +47,8 @@ IMPLICIT NONE
     
     ALLOCATE ( M(num_elem,num_elem) ) !Alocate size for M and K matricies
     ALLOCATE ( K(num_elem,num_elem) )
+	ALLOCATE ( MB(num_elem,2) ) !Alocate size for MB and KB matricies
+    ALLOCATE ( KB(num_elem,2) )
     
     M=0 !Set matricies to all 0s
     K=0
@@ -74,13 +77,16 @@ IMPLICIT NONE
         K(j:i , j:i) = K(j:i, j:i) +  K_ins
         j = i 
     END DO
+	
+	MB = bandify(num_elem, M)
+	KB = bandify(num_elem, K)
     
     ALLOCATE ( eig_out( num_elem ) )
     ALLOCATE ( work_out( 3*num_elem ) )
     one = 1
     
     !dsbgv(   JOBZ, UPLO,       N,  KA,  KB, AB,    LDAB, BB,    LDBB,       W,     Z, LDZ,     WORK, INFO )
-    CALL dsbgv('N', 'L', num_elem, one, one, K, num_elem, M, num_elem, eig_out, z_out, one, work_out, info_out)
+    CALL dsbgv('N', 'L', num_elem, one, one, KB, num_elem, MB, num_elem, eig_out, z_out, one, work_out, info_out)
     
     DO i =1, SIZE(eig_out) 
         PRINT *, eig_out(i)
@@ -90,3 +96,19 @@ IMPLICIT NONE
     PRINT *, info_out
 
 END PROGRAM fea_driver
+
+FUNCTION bandify(mat_size, mat_in)
+USE fea_init
+IMPLICIT NONE
+	INTEGER(KIND=iknd) :: mat_size !the n by n size of mat_in
+    REAL(KIND=rknd), INTENT(IN), DIMENSION(mat_size, mat_size) :: mat_in !Ordinary matrix in
+    REAL(KIND=rknd), INTENT(OUT), DIMENSION(mat_size, 2) :: bandify !Banded matrix out
+	INTEGER(KIND=iknd) :: i, j !Iteration counters
+	
+	DO i = 1, (mat_size - 1)
+		bandify(i,1) = mat_in(i,i)
+		bandify(i,2) = mat_in(i,i+1)
+    END DO
+	bandify(mat_size,1) = mat_in(mat_size,mat_size)
+	
+END FUNCTION bandify
