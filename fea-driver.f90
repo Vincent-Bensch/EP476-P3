@@ -95,20 +95,17 @@ IMPLICIT NONE
     PRINT *, "INFO:"
     PRINT *, info_out
 
+CONTAINS
+    FUNCTION bandify(mat_size, mat_in)
+        INTEGER(KIND=iknd) :: mat_size !the n by n size of mat_in
+    	REAL(KIND=rknd), INTENT(IN), DIMENSION(mat_size, mat_size) :: mat_in !Ordinary matrix in
+    	REAL(KIND=rknd), DIMENSION(mat_size, 2) :: bandify !Banded matrix out
+    	INTEGER(KIND=iknd) :: ib !Iteration counter
+	
+	DO ib = 1, (mat_size - 1)
+	    bandify(ib,1) = mat_in(ib,ib)
+	    bandify(ib,2) = mat_in(ib,ib+1)
+    	END DO
+	bandify(mat_size,1) = mat_in(mat_size,mat_size)	
+    END FUNCTION bandify
 END PROGRAM fea_driver
-
-FUNCTION bandify(mat_size, mat_in)
-USE fea_init
-IMPLICIT NONE
-	INTEGER(KIND=iknd) :: mat_size !the n by n size of mat_in
-    REAL(KIND=rknd), INTENT(IN), DIMENSION(mat_size, mat_size) :: mat_in !Ordinary matrix in
-    REAL(KIND=rknd), INTENT(OUT), DIMENSION(mat_size, 2) :: bandify !Banded matrix out
-	INTEGER(KIND=iknd) :: i, j !Iteration counters
-	
-	DO i = 1, (mat_size - 1)
-		bandify(i,1) = mat_in(i,i)
-		bandify(i,2) = mat_in(i,i+1)
-    END DO
-	bandify(mat_size,1) = mat_in(mat_size,mat_size)
-	
-END FUNCTION bandify
