@@ -43,7 +43,7 @@ IMPLICIT NONE
     PRINT *,"Enter the desired number of elements:"
     READ *,num_elem
     
-    dx = L/num_elem !Compute dx
+    dx = REAL(L)/REAL(num_elem) !Compute dx
     
     ALLOCATE ( M(num_elem,num_elem) ) !Alocate size for M and K matricies
     ALLOCATE ( K(num_elem,num_elem) )
@@ -57,14 +57,14 @@ IMPLICIT NONE
     M_elem(1,1) = 1/3.
     M_elem(2,2) = 1/3.
     
-    K = -1  !Set K element contributions
+    K_elem = -1  !Set K element contributions
     K_elem(1,1) = 1
     K_elem(2,2) = 1
     
     M(1,1) = dx * rho_0 / 3 !Set top left matrix element from first beam element
     j = 1 ! J counter should always be one less than i
     DO i = 2,num_elem !Loop to create M matrix
-        rho_i = rho_0 + (i / num_elem) * rho_1 !Compute density at i
+        rho_i = rho_0 + (REAL(i) / REAL(num_elem)) * rho_1 !Compute density at i
         M(j:i , j:i) = M(j:i, j:i) + M_elem * ( dx * rho_i ) !Compute M element and add to M matrix
         j = i !Set j counter for next loop
     END DO
