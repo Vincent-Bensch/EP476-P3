@@ -6,7 +6,7 @@ IMPLICIT NONE
     INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
     
     !Initializing input variables
-    REAL(KIND=rknd) :: rho_0, rho_1, E, L !rho_0 and rho_L are the densities at the fixed and free end of the beam respectivly. E is the modulus of elasticity, and L is the length of the beam.
+    REAL(KIND=rknd) :: rho_0, rho_1, E, L !rho_0 and rho_1 are the density at the fixed end of the beam, and the slope of the density line respectively. E is the  modulus of elasticity, and L is the length of the beam.
     INTEGER(KIND=iknd) :: num_elem !Intiger to store the number of elements the beam is to be devided up into.
     
     !Initializing process variables
@@ -78,6 +78,6 @@ IMPLICIT NONE
     CALL dsbgv('N', 'L', num_elem, one, one, K, num_elem, M, num_elem, eig_out, z_out, one, work_out, info_out)
     
     DO i =1, SIZE(eig_out) 
-        PRINT *, eig_out(1)
+        PRINT *, eig_out(i)
     END DO    
 END PROGRAM fea_driver

@@ -5,7 +5,7 @@ IMPLICIT NONE
     INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
     
     !Initializing input variables
-    REAL(KIND=rknd) :: rho_o, rho_1, E, L !rho_0 and rho_1 are the densities at the fixed and free end of the beam respectivly. E is the modulus of elasticity, and L is the length of the beam.
+    REAL(KIND=rknd) :: rho_0, rho_1, E, L !rho_0 and rho_1 are the density at x=0 and the density slope across the beam respectively
     INTEGER(KIND=iknd) :: num_elem !Intiger to store the number of elements the beam is to be devided up into.
     
     !Initializing process variables
@@ -20,6 +20,7 @@ IMPLICIT NONE
     REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out, work_out
     REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
     INTEGER(KIND=iknd) :: info_out, one
+    
 END MODULE fea_init
 
 
@@ -30,7 +31,7 @@ IMPLICIT NONE
     !Get parameters from user
     PRINT *,"Enter the density at x=0 (rho_0):"
     READ *,rho_o
-    PRINT *,"Enter the density at x=L (rho_L):"
+    PRINT *,"Enter the density slope (rho_1):"
     READ *,rho_L
     PRINT *,"Enter the beam length (L):"
     READ *,L
@@ -39,8 +40,6 @@ IMPLICIT NONE
     PRINT *,"Enter the desired number of elements:"
     READ *,num_elem
     
-    rho_m = (rho_L - rho_o)/(num_elem - 1) !Computing density slope
-    rho_b = rho_L - rho_m !Computing density y offset
     dx = L/num_elem !Compute dx
     
     ALLOCATE ( M(num_elem,num_elem) ) !Alocate size for M and K matricies
@@ -57,10 +56,10 @@ IMPLICIT NONE
     M_elem(1,1) = 1
     M_elem(2,2) = 1
     
-    M(1,1) = dx * rho_o / 3 !Set top left matrix element from first beam element
+    M(1,1) = dx * rho_0 / 3 !Set top left matrix element from first beam element
     DO i = 2,num_elem !Loop to create M matrix
         j = i-1
-        tmp = dx * ( ( rho_m * i ) + rho_b)
+        tmp = rho_0 + dx *)
         M(j:i , j:i) = M_elem * tmp
     END DO
     
