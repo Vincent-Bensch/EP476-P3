@@ -78,6 +78,8 @@ IMPLICIT NONE
     ALLOCATE ( eig_out( num_elem ) )
     ALLOCATE ( work_out( 3*num_elem ) )
     one = 1
+    
+    !dsbgv(   JOBZ, UPLO,       N,  KA,  KB, AB,    LDAB, BB,    LDBB,       W,     Z, LDZ,     WORK, INFO )
     CALL dsbgv('N', 'L', num_elem, one, one, K, num_elem, M, num_elem, eig_out, z_out, one, work_out, info_out)
     
     DO i =1, SIZE(eig_out) 
