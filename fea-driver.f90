@@ -6,14 +6,15 @@ IMPLICIT NONE
     INTEGER, PARAMETER :: iknd=SELECTED_INT_KIND(14)
     
     !Initializing input variables
-    REAL(KIND=rknd) :: rho_0, rho_1, E, L !rho_0 and rho_1 are the density at the fixed end of the beam, and the slope of the density line respectively. E is the  modulus of elasticity, and L is the length of the beam.
+    REAL(KIND=rknd) :: rho_0, rho_1, rho_i, E, L !rho_0 and rho_1 are the density at the fixed end of the beam, and the slope of the density line respectively. E is the  modulus of elasticity, and L is the length of the beam. rho_i is the density at the point of iteration
     INTEGER(KIND=iknd) :: num_elem !Intiger to store the number of elements the beam is to be devided up into.
     
     !Initializing process variables
     REAL(KIND=rknd) :: dx !element x step allong L
     REAL(KIND=rknd) :: tmp !dummy computation variable
+    REAL(KIND=rknd) :: K_mul
     REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: M, K !Initialize M and K matricies
-    REAL(KIND=rknd), DIMENSION(2, 2) :: element, K_elem, M_elem !Sub matrix for current computation
+    REAL(KIND=rknd), DIMENSION(2, 2) :: K_elem, K_ins, M_elem !Sub matrix for current computation
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
 
@@ -60,16 +61,18 @@ IMPLICIT NONE
     M(1,1) = dx * rho_0 / 3 !Set top left matrix element from first beam element
     j = 1 ! J counter should always be one less than i
     DO i = 2,num_elem !Loop to create M matrix
-        tmp = rho_0 + dx * j * rho_1 !Compute density at current x
-        M(j:i , j:i) = M_elem * tmp
+        rho_i = rho_0 + (i / num_elem) * rho_i !Compute density at i
+        M(j:i , j:i) = M(j:i, j:i) + M_elem * ( dx * rho_i ) !Compute M element and add to M matrix
         j = i !Set j counter for next loop
     END DO
     
-    tmp = E/dx !Set contribution for each element in the K matrix
-    K(1,1) = tmp !Set top left matrix element from first beam element
+    K_mul = E/dx !Set contribution for each element in the K matrix
+    K_ins = K_mul * K_elem !Set insertion element for K matrix
+    K(1,1) = k_mul !Set top left matrix element comtribution from first beam element
+    j=1
     DO i = 2,num_elem !Loop to create K matrix
-        j = i-1
-        M(j:i , j:i) = K_elem * tmp
+        K(j:i , j:i) = K(j:i, j:i) +  K_ins
+        j = i 
     END DO
     
     ALLOCATE ( eig_out( num_elem ) )
@@ -80,4 +83,8 @@ IMPLICIT NONE
     DO i =1, SIZE(eig_out) 
         PRINT *, eig_out(i)
     END DO    
+
+    PRINT *, "INFO:"
+    PRINT *, info_out
+
 END PROGRAM fea_driver
