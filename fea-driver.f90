@@ -53,18 +53,18 @@ IMPLICIT NONE
     M=0 !Set matricies to all 0s
     K=0
     
-    K_elem = 1/6 !Set K element contributions
-    K_elem(1,1) = 1/3 
-    K_elem(2,1) = 1/3
+    M_elem = 1/6. !Set M element contributions
+    M_elem(1,1) = 1/3.
+    M_elem(2,2) = 1/3.
     
-    M_elem = -1  !Set M element contributions
-    M_elem(1,1) = 1
-    M_elem(2,2) = 1
+    K = -1  !Set K element contributions
+    K_elem(1,1) = 1
+    K_elem(2,2) = 1
     
     M(1,1) = dx * rho_0 / 3 !Set top left matrix element from first beam element
     j = 1 ! J counter should always be one less than i
     DO i = 2,num_elem !Loop to create M matrix
-        rho_i = rho_0 + (i / num_elem) * rho_i !Compute density at i
+        rho_i = rho_0 + (i / num_elem) * rho_1 !Compute density at i
         M(j:i , j:i) = M(j:i, j:i) + M_elem * ( dx * rho_i ) !Compute M element and add to M matrix
         j = i !Set j counter for next loop
     END DO
@@ -102,10 +102,10 @@ CONTAINS
     	REAL(KIND=rknd), DIMENSION(mat_size, 2) :: bandify !Banded matrix out
     	INTEGER(KIND=iknd) :: ib !Iteration counter
 	
-	DO ib = 1, (mat_size - 1)
-	    bandify(ib,1) = mat_in(ib,ib)
-	    bandify(ib,2) = mat_in(ib,ib+1)
+	    DO ib = 1, (mat_size - 1)
+	        bandify(ib,1) = mat_in(ib,ib)
+	        bandify(ib,2) = mat_in(ib,ib+1)
     	END DO
-	bandify(mat_size,1) = mat_in(mat_size,mat_size)	
+	    bandify(mat_size,1) = mat_in(mat_size,mat_size)	
     END FUNCTION bandify
 END PROGRAM fea_driver
