@@ -97,7 +97,7 @@ IMPLICIT NONE
     PRINT *, info_out
 
 CONTAINS
-    FUNCTION bandify(mat_size, mat_in)
+    FUNCTION bandify(mat_size, mat_in) !Function to convert matrix to banded array for compputation
         INTEGER(KIND=iknd) :: mat_size !the n by n size of mat_in
     	REAL(KIND=rknd), INTENT(IN), DIMENSION(mat_size, mat_size) :: mat_in !Ordinary matrix in
     	REAL(KIND=rknd), DIMENSION(mat_size, 2) :: bandify !Banded matrix out
@@ -108,7 +108,6 @@ CONTAINS
 	        bandify(ib,2) = mat_in(ib,ib+1)
     	END DO
 	    bandify(mat_size,1) = mat_in(mat_size,mat_size)	
-            bandify(mat_size,2) = 0
+        bandify(mat_size,2) = 0
     END FUNCTION bandify
 END PROGRAM fea_driver
-bandify(mat_size,1)
