@@ -15,7 +15,7 @@ IMPLICIT NONE
     REAL(KIND=rknd) :: K_mul
     REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: M, K !Initialize M and K matricies
     REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: MB, KB !Banded M and K
-	REAL(KIND=rknd), DIMENSION(2, 2) :: K_elem, K_ins, M_elem !Sub matrix for current computation
+    REAL(KIND=rknd), DIMENSION(2, 2) :: K_elem, K_ins, M_elem !Sub matrix for current computation
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
 
@@ -47,7 +47,7 @@ IMPLICIT NONE
     
     ALLOCATE ( M(num_elem,num_elem) ) !Alocate size for M and K matricies
     ALLOCATE ( K(num_elem,num_elem) )
-	ALLOCATE ( MB(num_elem,2) ) !Alocate size for MB and KB matricies
+    ALLOCATE ( MB(num_elem,2) ) !Alocate size for MB and KB matricies
     ALLOCATE ( KB(num_elem,2) )
     
     M=0 !Set matricies to all 0s
@@ -78,8 +78,8 @@ IMPLICIT NONE
         j = i 
     END DO
 	
-	MB = bandify(num_elem, M)
-	KB = bandify(num_elem, K)
+    MB = bandify(num_elem, M)
+    KB = bandify(num_elem, K)
     
     ALLOCATE ( eig_out( num_elem ) )
     ALLOCATE ( work_out( 3*num_elem ) )
