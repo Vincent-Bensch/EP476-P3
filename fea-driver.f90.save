@@ -14,15 +14,16 @@ IMPLICIT NONE
     REAL(KIND=rknd) :: tmp !dummy computation variable
     REAL(KIND=rknd) :: K_mul
     REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: M, K !Initialize M and K matricies
-    REAL(KIND=rknd), DIMENSION(:, :), ALLOCATABLE :: MB, KB !Banded M and K
     REAL(KIND=rknd), DIMENSION(2, 2) :: K_elem, K_ins, M_elem !Sub matrix for current computation
+    REAL(KIND=rknd), DIMENSION(:, 2), ALLOCATABLE :: MB, KB !Banded version of M and K matricies
 
     INTEGER(KIND=iknd) :: i,j !integer for loop iteration
 
     !Variabled to catch DSBGV output
     REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out, work_out
     REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
-    INTEGER(KIND=iknd) :: info_out, one, two
+       INTEGER(KIND=iknd) :: info_out, one
+INTEGER(KIND=iknd) :: info_out, one
     
 END MODULE fea_init
 
@@ -43,28 +44,26 @@ IMPLICIT NONE
     PRINT *,"Enter the desired number of elements:"
     READ *,num_elem
     
-    dx = REAL(L)/REAL(num_elem) !Compute dx
+    dx = L/num_elem !Compute dx
     
     ALLOCATE ( M(num_elem,num_elem) ) !Alocate size for M and K matricies
     ALLOCATE ( K(num_elem,num_elem) )
-    ALLOCATE ( MB(num_elem, 2) ) !Alocate size for MB and KB matricies
-    ALLOCATE ( KB(num_elem, 2) )
     
     M=0 !Set matricies to all 0s
     K=0
     
-    M_elem = 1/6. !Set M element contributions
-    M_elem(1,1) = 1/3.
-    M_elem(2,2) = 1/3.
+    K_elem = 1/6 !Set K element contributions
+    K_elem(1,1) = 1/3 
+    K_elem(2,1) = 1/3
     
-    K_elem = -1  !Set K element contributions
-    K_elem(1,1) = 1
-    K_elem(2,2) = 1
+    M_elem = -1  !Set M element contributions
+    M_elem(1,1) = 1
+    M_elem(2,2) = 1
     
     M(1,1) = dx * rho_0 / 3 !Set top left matrix element from first beam element
     j = 1 ! J counter should always be one less than i
     DO i = 2,num_elem !Loop to create M matrix
-        rho_i = rho_0 + (REAL(i) / REAL(num_elem)) * rho_1 !Compute density at i
+        rho_i = rho_0 + (i / num_elem) * rho_i !Compute density at i
         M(j:i , j:i) = M(j:i, j:i) + M_elem * ( dx * rho_i ) !Compute M element and add to M matrix
         j = i !Set j counter for next loop
     END DO
@@ -77,17 +76,13 @@ IMPLICIT NONE
         K(j:i , j:i) = K(j:i, j:i) +  K_ins
         j = i 
     END DO
-	
-    MB = bandify(num_elem, M)
-    KB = bandify(num_elem, K)
     
     ALLOCATE ( eig_out( num_elem ) )
     ALLOCATE ( work_out( 3*num_elem ) )
     one = 1
-    two = 2
     
-    !dsbgv(   JOBZ, UPLO,       N,  KA,  KB, AB,LDAB, BB,LDBB,       W,     Z, LDZ,     WORK, INFO )
-    CALL dsbgv('N', 'L', num_elem, one, one, KB, two, MB, two, eig_out, z_out, one, work_out, info_out)
+    !dsbgv(   JOBZ, UPLO,       N,  KA,  KB, AB,    LDAB, BB,    LDBB,       W,     Z, LDZ,     WORK, INFO )
+    CALL dsbgv('N', 'L', num_elem, one, one, K, num_elem, M, num_elem, eig_out, z_out, one, work_out, info_out)
     
     DO i =1, SIZE(eig_out) 
         PRINT *, eig_out(i)
@@ -96,19 +91,10 @@ IMPLICIT NONE
     PRINT *, "INFO:"
     PRINT *, info_out
 
-CONTAINS
-    FUNCTION bandify(mat_size, mat_in)
-        INTEGER(KIND=iknd) :: mat_size !the n by n size of mat_in
-    	REAL(KIND=rknd), INTENT(IN), DIMENSION(mat_size, mat_size) :: mat_in !Ordinary matrix in
-    	REAL(KIND=rknd), DIMENSION(mat_size, 2) :: bandify !Banded matrix out
-    	INTEGER(KIND=iknd) :: ib !Iteration counter
-	
-	    DO ib = 1, (mat_size - 1)
-	        bandify(ib,1) = mat_in(ib,ib)
-	        bandify(ib,2) = mat_in(ib,ib+1)
-    	END DO
-	    bandify(mat_size,1) = mat_in(mat_size,mat_size)	
-            bandify(mat_size,2) = 0
-    END FUNCTION bandify
 END PROGRAM fea_driver
-bandify(mat_size,1)
+
+FUNCTION BANDIFY(mat_size, mat_in, mat_out)
+USE fea_init
+IMPLICIT NONE
+    INTEGER mat_size
+
