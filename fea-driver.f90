@@ -22,7 +22,7 @@ IMPLICIT NONE
     !Variabled to catch DSBGV output
     REAL(KIND=rknd), DIMENSION(:), ALLOCATABLE :: eig_out, work_out
     REAL(KIND=rknd), DIMENSION(1, 1) :: z_out
-    INTEGER(KIND=iknd) :: info_out, one, two
+    INTEGER(KIND=iknd) :: info_out, one
     
 END MODULE fea_init
 
@@ -84,10 +84,9 @@ IMPLICIT NONE
     ALLOCATE ( eig_out( num_elem ) )
     ALLOCATE ( work_out( 3*num_elem ) )
     one = 1
-    two = 2
     
-    !dsbgv(   JOBZ, UPLO,       N,  KA,  KB, AB,LDAB, BB,LDBB,       W,     Z, LDZ,     WORK, INFO )
-    CALL dsbgv('N', 'L', num_elem, one, one, KB, two, MB, two, eig_out, z_out, one, work_out, info_out)
+    !dsbgv(   JOBZ, UPLO,       N,  KA,  KB, AB,     LDAB, BB,     LDBB,       W,     Z, LDZ,     WORK, INFO )
+    CALL dsbgv('N', 'L', num_elem, one, one, KB, num_elem, MB, num_elem, eig_out, z_out, one, work_out, info_out)
     
     DO i =1, SIZE(eig_out) 
         PRINT *, eig_out(i)
